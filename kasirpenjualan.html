@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kasir Otomatis</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #1e1e2e, #3a0ca3);
+        color: #fff;
+        margin: 0;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+    }
+    .box {
+        background: rgba(255, 255, 255, 0.07);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    input, button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 10px;
+    }
+    input {
+        background: rgba(255,255,255,0.8);
+    }
+    button {
+        background: #4cc9f0;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    button:hover { background: #4895ef; }
+    .product, .cart-item {
+        background: rgba(255,255,255,0.1);
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .total-box {
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 10px;
+    }
+</style>
+</head>
+<body>
+<h1>KASIR OTOMATIS KHUSUS PENJUALAN</h1>
+
+<div class="container">
+
+    <!-- Produk -->
+    <div class="box">
+        <h2>Daftar Produk</h2>
+        <div id="productList"></div>
+
+        <h3>Tambah Produk Baru</h3>
+        <input type="text" id="pName" placeholder="Nama Produk">
+        <input type="number" id="pPrice" placeholder="Harga">
+        <button onclick="addProduct()">Tambah Produk</button>
+    </div>
+
+    <!-- Keranjang -->
+    <div class="box">
+        <h2>Keranjang</h2>
+        <div id="cart"></div>
+        <button style="background:#f72585" onclick="clearCart()">Kosongkan Keranjang</button>
+    </div>
+
+    <!-- Total -->
+    <div class="box">
+        <h2>Ringkasan</h2>
+        <div class="total-box">Total: Rp <span id="total">0</span></div>
+    </div>
+
+</div>
+
+<script>
+let products = [
+    { name: "Kopi Susu", price: 15000 },
+    { name: "Nasi Goreng", price: 25000 },
+    { name: "Es Teh Manis", price: 7000 }
+];
+let cart = [];
+
+function renderProducts() {
+    let list = document.getElementById("productList");
+    list.innerHTML = "";
+    products.forEach((p, i) => {
+        list.innerHTML += `
+            <div class='product'>
+                <span>${p.name} (Rp ${p.price})</span>
+                <button onclick="addToCart(${i})">+ Tambah</button>
+            </div>
+        `;
+    });
+}
+
+function addProduct() {
+    let name = document.getElementById("pName").value;
+    let price = parseInt(document.getElementById("pPrice").value);
+
+    if (!name || !price) return alert("Lengkapi data!");
+
+    products.push({ name, price });
+    renderProducts();
+
+    document.getElementById("pName").value = "";
+    document.getElementById("pPrice").value = "";
+}
+
+function addToCart(index) {
+    let item = products[index];
+    let found = cart.find(c => c.name === item.name);
+
+    if (found) found.qty++; 
+    else cart.push({ ...item, qty: 1 });
+
+    renderCart();
+}
+
+function renderCart() {
+    let list = document.getElementById("cart");
+    list.innerHTML = "";
+
+    cart.forEach((c, i) => {
+        list.innerHTML += `
+            <div class='cart-item'>
+                <span>${c.name} x ${c.qty}</span>
+                <button onclick="removeItem(${i})">Hapus</button>
+            </div>`;
+    });
+
+    calculateTotal();
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    renderCart();
+}
+
+function clearCart() {
+    cart = [];
+    renderCart();
+}
+
+function calculateTotal() {
+    let total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    document.getElementById("total").innerText = total;
+}
+
+renderProducts();
+</script>
+</body>
+  </html>
